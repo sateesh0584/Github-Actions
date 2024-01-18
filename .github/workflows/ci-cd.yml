@@ -3,7 +3,7 @@ name: Build The Theme & Deploy
 on:
   pull request:
     branches:
-      - dev-deploy
+      - main
     types: [closed]
 
 defaults:
