@@ -1,17 +1,28 @@
-name: CI
+name: Deploy to WordPress
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Deploy to WordPress
       run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+        cd ubuntu/wordpress/project
+        zip -r wordpress.zip .
+
+        # Assuming you have SSH keys set up on your server
+        scp -o StrictHostKeyChecking=no -r wordpress.zip user@your-server-ip:/path/to/destination
+
+        # Connect to the server and unzip the WordPress files
+        ssh -o StrictHostKeyChecking=no user@your-server-ip 'cd /path/to/destination && unzip -o wordpress.zip'
+
+        # Clean up the zip file
+        rm wordpress.zip
