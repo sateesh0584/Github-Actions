@@ -13,6 +13,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 14
+
     - name: Build
       run: echo "Building the project..."
 
@@ -31,10 +36,14 @@ jobs:
         node-version: 14
 
     - name: Install Dependencies
-      run: npm install
+      run: |
+        cd path/to/your/project  # Change to your actual project directory
+        npm install
 
     - name: Run Tests
-      run: npm test
+      run: |
+        cd path/to/your/project  # Change to your actual project directory
+        npm test
 
   deploy:
     runs-on: ubuntu-latest
