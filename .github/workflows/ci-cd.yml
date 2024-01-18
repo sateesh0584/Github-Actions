@@ -5,52 +5,45 @@ on:
     branches:
       - main
 
-stages:
-  - build
-  - test
-  - deploy
-
 jobs:
-  build-my-first-job:
-    stage: build
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      - name: Build
-        run: echo "This is the first build job."
+    - name: Build
+      run: echo "Building the project..."
 
-  test-my-first-job:
-    stage: test
+  test:
     runs-on: ubuntu-latest
-    needs: build-my-first-job
+
+    needs: build
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 14
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 14
 
-      - name: Install Dependencies
-        run: |
-          cd path/to/your/project  # Change to your actual project directory
-          npm install
+    - name: Install Dependencies
+      run: npm install
 
-      - name: Test
-        run: |
-          cd path/to/your/project  # Change to your actual project directory
-          npm test
+    - name: Run Tests
+      run: npm test
 
-  deploy-first-job:
-    stage: deploy
+  deploy:
     runs-on: ubuntu-latest
-    needs: test-my-first-job
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
 
-      - name: Deploy
-        run: echo "This is the deploy first job."
+    needs: test
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Deploy
+      run: echo "Deploying the project..."
