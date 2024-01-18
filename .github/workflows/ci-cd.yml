@@ -29,10 +29,16 @@ jobs:
       run: |
         # Add your test commands for WordPress here
 
+    - name: Prepare Deployment
+      run: |
+        # Exclude unnecessary files (e.g., Git-related files) from the zip archive
+        find . -type d -name ".git" -exec rm -rf {} +
+        find . -name ".git*" -exec rm -rf {} +
+        zip -r wordpress.zip .
+
     - name: Deploy to WordPress
       run: |
-        zip -r wordpress.zip .
         # Replace the following placeholders with your deployment details
         scp -o StrictHostKeyChecking=no -r wordpress.zip user@your-server-ip:/path/to/destination
-        ssh -o StrictHostKeyChecking=no user@your-server-ip 'cd /path/to/destination && unzip -o wordpress.zip'
+        ssh -o StrictHostKeyChecking=no ubuntu@ip-172-31-10-29 'cd /home/ubuntu && unzip -o wordpress.zip'
         rm wordpress.zip
