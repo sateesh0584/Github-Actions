@@ -35,14 +35,10 @@ jobs:
       with:
         node-version: 14
 
-    - name: Install Dependencies
+    - name: Install Dependencies and Run Tests
       run: |
-        cd path/to/your/project  # Change to your actual project directory
+        cd $GITHUB_WORKSPACE  # This variable points to the repository root
         npm install
-
-    - name: Run Tests
-      run: |
-        cd path/to/your/project  # Change to your actual project directory
         npm test
 
   deploy:
