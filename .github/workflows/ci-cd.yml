@@ -1,44 +1,19 @@
-name: CI/CD Pipeline
+stages: 
+    - build
+    - test
+    - deploy
 
-on:
-  push:
-    branches:
-      - main
-
-stages:
-  - build
-  - test
-  - deploy
-
-jobs:
-  build-my-first-job:
+build-my-first-job:
     stage: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    script:
+        - echo "this is first build job."
 
-      - name: Build
-        run: echo "This is the first build job."
-
-  test-my-first-job:
+test-my-first-job:
     stage: test
-    runs-on: ubuntu-latest
-    needs: build-my-first-job
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    script:
+        - echo "this is first test job."
 
-      - name: Test
-        run: echo "This is the first test job."
-
-  deploy-first-job:
+deploy-first-job:
     stage: deploy
-    runs-on: ubuntu-latest
-    needs: test-my-first-job
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Deploy
-        run: echo "This is the deploy first job."
+    script:
+        - echo "this is deploy first job."
