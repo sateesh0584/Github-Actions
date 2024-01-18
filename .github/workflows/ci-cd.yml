@@ -1,23 +1,71 @@
-name: Create Sample File
+name: Build The Theme & Deploy
 
 on:
-  push:
+  pull request:
     branches:
-      - main
+      - dev-deploy
+    types: [closed]
+
+defaults:
+  run:
+    working-directory: themes/my-theme
 
 jobs:
-  create_file:
+  run-github-action:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Create Sample File
-      run: |
-        echo "This is a sample file created by GitHub Actions" > sample.txt
-        git config user.name "GitHub Actions"
-        git config user.email "actions@example.com"
-        git add sample.txt
-        git commit -m "Add sample.txt via GitHub Actions"
-        git push origin main
+      - uses: actions/checkout@v2
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: ADD NODE JS v12.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: "12.x"
+      - name: ADD PHP v 7.4.x
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: composer:v2
+      - name: RUN NPM
+        run: npm ci
+      - name: RUN COMPOSER
+        run: composer install
+      - name: BUILD THEME
+        run: npm run prod
+      - name: Before Deployment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            sudo rm -rf /var/www/html/wp/wp-content/themes/my-theme/*
+            sudo chown -R ubuntu /var/www/html/wp/wp-content/themes/
+      - name: Deploy to AWS Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          SOURCE: "themes/my-theme/"
+          TARGET: "/var/www/html/wp/wp-content/themes/my-theme/"
+          EXCLUDE: "/node_modules/"
+      - name: After Deployment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            sudo chown -R www-data:www-data /var/www/html/wp/wp-content/themes/
