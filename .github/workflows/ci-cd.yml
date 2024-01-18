@@ -1,4 +1,4 @@
-name: Deploy to WordPress
+name: WordPress CI/CD
 
 on:
   push:
@@ -13,16 +13,26 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 14
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build WordPress Application
+      run: |
+        # Add your build commands for WordPress here
+
+    - name: Run Tests
+      run: |
+        # Add your test commands for WordPress here
+
     - name: Deploy to WordPress
       run: |
-        cd ubuntu/wordpress/project
         zip -r wordpress.zip .
-
-        # Assuming you have SSH keys set up on your server
+        # Replace the following placeholders with your deployment details
         scp -o StrictHostKeyChecking=no -r wordpress.zip user@your-server-ip:/path/to/destination
-
-        # Connect to the server and unzip the WordPress files
         ssh -o StrictHostKeyChecking=no user@your-server-ip 'cd /path/to/destination && unzip -o wordpress.zip'
-
-        # Clean up the zip file
         rm wordpress.zip
