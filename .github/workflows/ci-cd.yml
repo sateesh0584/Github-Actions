@@ -35,9 +35,12 @@ jobs:
       with:
         node-version: 14
 
+    - name: Display Directory Contents
+      run: ls -R $GITHUB_WORKSPACE
+
     - name: Install Dependencies and Run Tests
       run: |
-        cd $GITHUB_WORKSPACE  # This variable points to the repository root
+        cd $GITHUB_WORKSPACE
         npm install
         npm test
 
